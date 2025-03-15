@@ -102,7 +102,7 @@ type ExtractExample = {
 type CustomExtract<TObj, StartsWith> = {
   [TKey in keyof TObj as TKey extends `${StartsWith & string}${string}`
     ? TKey
-    : never];
+    : never]: TObj[TKey];
 };
 
 type ObjectOfKeysStartingWith<TObj, KeyStartWith extends keyof TObj> = {
@@ -393,6 +393,34 @@ const entityWithId: EntityWithId = {
 };
 
 /** ################################################################################################################################################################################################# */
+import type { Equal, Expect } from "./index.d";
+
+type Modifier<T extends string[], P extends '__' | '--'> = T extends [] ? '' : `${P}${T[number]}` 
+
+type BEM<B extends string, E extends string[], M extends string[]> = `${B}${Modifier<E, '__'>}${Modifier<M, '--'>}`;
+
+/* _____________ Test Cases _____________ */
+
+type cases = [
+  Expect<Equal<BEM<'btn', ['price'], []>, 'btn__price'>>,
+  Expect<Equal<BEM<'btn', ['price'], ['warning', 'success']>, 'btn__price--warning' | 'btn__price--success' >>,
+  Expect<Equal<BEM<'btn', [], ['small', 'medium', 'large']>, 'btn--small' | 'btn--medium' | 'btn--large' >>,
+]
+
+
+/* _____________ Your Code Here _____________ */
+
+type CompareArrayLength<T extends any[], U extends any[]> = T['length'] extends U['length'] ? 0 : U['length'] extends T[number] ? 1 : -1;
+
+/* _____________ Test Cases _____________ */
+
+type cases1 = [
+  Expect<Equal<CompareArrayLength<[1, 2, 3, 4], ["2", "6", undefined]>, 1>>,
+  Expect<Equal<CompareArrayLength<[1, 2], [3, 4, 5, 6]>, -1>>,
+  Expect<Equal<CompareArrayLength<[], []>, 0>>,
+  Expect<Equal<CompareArrayLength<[1, 2, 3], [4, 5, 6]>, 0>>,
+]
+
 
 /*** Exercises  */
 
